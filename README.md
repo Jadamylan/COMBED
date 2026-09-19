@@ -19,7 +19,7 @@ Business calculations (revenue, average ticket, price consistency, service mix, 
         +  Live local-market signals from Apify (North Highlands salons)
         +  Live AI reasoning
         ↓
-YOUR CHAIR CONE  →  Your Next 20 Days
+YOUR CHAIR, COMBED (the Chair Cone report)  →  Your Next 20 Days
 ```
 
 The report is one scrolling page:

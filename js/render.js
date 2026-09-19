@@ -47,7 +47,7 @@ window.Combed = window.Combed || {};
     return `
       <header class="cone-head">
         <p class="eyebrow">${esc(meta.modeLabel)}</p>
-        <h2 class="display">YOUR CHAIR CONE</h2>
+        <h2 class="display">YOUR CHAIR, COMBED</h2>
         <p class="cone-sub">Based on <strong>${cm.observed_calendar_days || 20} observed calendar days</strong>${cm.period_start ? ` · ${util.shortDate(cm.period_start)} – ${util.shortDate(cm.period_end)}` : ''}</p>
         ${meta.coverage ? `<p class="coverage"><span class="coverage__l">Analysis coverage</span> <strong>${meta.coverage.included} of ${meta.coverage.total}</strong> appointments were confidently read and included in this report${meta.coverage.total ? ` (${Math.round((meta.coverage.included / meta.coverage.total) * 100)}%)` : ''}.</p>` : ''}
         ${meta.fallbackNotice ? `<p class="coverage coverage--soft">${esc(meta.fallbackNotice)}</p>` : ''}
