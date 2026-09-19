@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Combed — Know your chair. Work it smarter.</title>
+  <meta name="description" content="Combed turns the appointment book you already use into clear answers about your schedule, your prices, your services, and your time.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Caveat:wght@500;600&family=Fraunces:ital,opsz,wght@1,9..144,400;1,9..144,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231F5A45'/%3E%3Cpath d='M18 22h16l16 22 16-22h16v20H18z' fill='%23F5EEE3'/%3E%3Cg fill='%23F5EEE3'%3E%3Crect x='18' y='40' width='8' height='42' rx='3'/%3E%3Crect x='32' y='40' width='8' height='42' rx='3'/%3E%3Crect x='46' y='40' width='8' height='42' rx='3'/%3E%3Crect x='60' y='40' width='8' height='42' rx='3'/%3E%3Crect x='74' y='40' width='8' height='42' rx='3'/%3E%3C/g%3E%3C/svg%3E">
+</head>
+<body>
+
+  <!-- ═══════════════════════ 1. HERO ═══════════════════════ -->
+  <header class="hero grid-paper" id="top">
+    <nav class="nav" aria-label="Primary">
+      <a class="wordmark" href="#top" aria-label="Combed home">
+        <span>CO</span><svg class="pick-m" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+          <path d="M6 12h20l24 30 24-30h20v30H6z"/>
+          <rect x="6"  y="38" width="11" height="56" rx="4"/>
+          <rect x="26" y="38" width="11" height="56" rx="4"/>
+          <rect x="44.5" y="38" width="11" height="56" rx="4"/>
+          <rect x="63" y="38" width="11" height="56" rx="4"/>
+          <rect x="83" y="38" width="11" height="56" rx="4"/>
+        </svg><span>BED</span>
+      </a>
+      <a class="nav__link" href="#upload">Start</a>
+    </nav>
+
+    <div class="hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow">Business intelligence for stylists with a real appointment book</p>
+        <h1 class="display display--xl">Know your chair.<br>Work it smarter.</h1>
+        <p class="hero__lede">Turn the appointment book you already use into clear answers about your schedule, your prices, and your time.</p>
+        <a class="btn btn--primary btn--xl" href="#upload" id="cta-hero">COMB MY BUSINESS</a>
+        <p class="hero__sub">Built for stylists who know hair — not spreadsheets.</p>
+      </div>
+
+      <!-- Editorial collage: local assets; styled placeholders until photos are added -->
+      <div class="collage" aria-label="Salon culture collage">
+        <figure class="collage__item collage__item--a">
+          <div class="collage__ph"><span>Salon photo</span></div>
+          <img src="assets/salon-1.jpg" alt="A stylist parting and retwisting a client's locs at her chair" loading="lazy" onerror="this.remove()">
+          <figcaption class="handwritten">the chair she built</figcaption>
+        </figure>
+        <figure class="collage__item collage__item--b">
+          <div class="collage__ph collage__ph--cream"><span>Salon photo</span></div>
+          <img src="assets/salon-2.jpg" alt="A client at the shampoo bowl, locs lathered, looking up at the camera" loading="lazy" onerror="this.remove()">
+        </figure>
+        <figure class="collage__item collage__item--c">
+          <div class="collage__ph"><span>Salon photo</span></div>
+          <img src="assets/salon-3.jpg" alt="A stylist sectioning locs with clips while the client watches a tablet, another client in the mirror behind" loading="lazy" onerror="this.remove()">
+          <figcaption class="handwritten">every chair has a story</figcaption>
+        </figure>
+        <div class="collage__note">
+          <span class="handwritten">Tues · 9:00 — Ms. J — press</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow" aria-label="How Combed works">
+      <span>Handwritten appointment book</span><b>→</b>
+      <span>Quick review</span><b>+</b>
+      <span>Local market signals</span><b>+</b>
+      <span>AI reasoning</span><b>→</b>
+      <strong>Your Chair Cone</strong>
+    </div>
+  </header>
+
+  <main>
+    <!-- ═══════════════════════ 2. UPLOAD ═══════════════════════ -->
+    <section class="section" id="upload">
+      <div class="section__head">
+        <span class="step">1</span>
+        <h2>Start with your appointment book.</h2>
+        <p>Upload photos of the pages you want Combed to review. Around four pages works well.</p>
+      </div>
+
+      <label class="dropzone" for="file-input" id="dropzone">
+        <input type="file" id="file-input" accept="image/*" multiple hidden>
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 34v4a4 4 0 004 4h20a4 4 0 004-4v-4M24 6v26M14 16l10-10 10 10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <strong>Tap to add photos</strong>
+        <span>or drag them here · JPG, PNG, HEIC</span>
+      </label>
+      <ul class="thumbs" id="thumbs" aria-live="polite"></ul>
+      <div class="row-actions" id="read-actions" hidden>
+        <button class="btn btn--primary" type="button" id="read-btn">READ MY BOOK</button>
+        <span class="read-status" id="read-status" aria-live="polite"></span>
+      </div>
+      <ul class="page-notes" id="page-notes" hidden></ul>
+      <p class="notice notice--soft" id="upload-note">
+        <strong>Until you add photos, the review screen below shows clearly labeled sample entries</strong> so you can see the full Chair Cone. When you press <em>Read my book</em>, your pages are sent once to the reading model and the sample entries are replaced with what it found.
+      </p>
+    </section>
+
+    <!-- ═══════════════════════ 3. REVIEW THE BOOK ═══════════════════════ -->
+    <section class="section grid-paper" id="review-book">
+      <div class="section__head">
+        <span class="step">2</span>
+        <h2>Make sure we read your book right. <em class="opt-tag">optional</em></h2>
+        <p>Cursive is hard to read. Here's every appointment we found — the day, the time, what you did, what you charged, and any discount you wrote down. Entries we read confidently go straight into your Chair Cone. Flagged ones are set aside for later and won't distort your numbers — fix them here if you like, or skip straight to the report.</p>
+      </div>
+
+      <div class="review-meta">
+        <span class="data-badge" id="data-badge">Sample data (anonymized demo)</span>
+        <span class="review-count" id="review-count"></span>
+      </div>
+
+      <div class="table-wrap table-wrap--tall">
+        <table class="edit-table edit-table--appts" id="appt-table">
+          <thead>
+            <tr><th>Date</th><th>Time</th><th>Client</th><th>Service / style (as written)</th><th>Charged</th><th>Family discount</th><th>Check</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="help help--tight">A number like <strong>3</strong> in the book is the start time (3:00 PM) — never how long the appointment took. Client names were replaced with aliases before anything else happened.</p>
+
+      <div class="review" id="review" hidden>
+        <h4>Worth a second look</h4>
+        <ul id="review-list"></ul>
+      </div>
+
+      <div class="review review--skipped" id="skipped" hidden>
+        <h4>Skipped — these looked like notes or cancellations, not appointments</h4>
+        <p class="help">Nothing here is counted. If one of these was really a client visit, add it back.</p>
+        <ul id="skipped-list"></ul>
+      </div>
+
+      <div class="row-actions">
+        <button class="btn btn--ghost" type="button" id="reset-data">Reset to sample data</button>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ 3b. SUPPLEMENTAL (OPTIONAL) ═══════════════════════ -->
+    <section class="section" id="know">
+      <div class="section__head">
+        <span class="step step--opt">+</span>
+        <h2>Add what only you know. <em class="opt-tag">optional</em></h2>
+        <p>Your book says when clients came in and what they paid. It doesn't say how long each service took or how it feels on your body. If you tell us, Combed can also show revenue per hour, time-based price signals, and money-versus-energy. If you skip this, we simply won't guess.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="edit-table" id="menu-table">
+          <thead>
+            <tr><th>Service (as it appears in your book)</th><th>Typical minutes</th><th>Effort 1–5</th><th>Supply cost</th><th><span class="sr-only">Remove</span></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn--ghost" type="button" id="add-service">+ Add a service</button>
+        <button class="btn btn--ghost" type="button" id="sample-durations">Load sample estimates (demo)</button>
+        <button class="btn btn--ghost" type="button" id="clear-durations">Clear estimates</button>
+      </div>
+      <p class="help" id="duration-status"></p>
+    </section>
+
+    <!-- ═══════════════════════ 4. GOALS ═══════════════════════ -->
+    <section class="section" id="goals">
+      <div class="section__head">
+        <span class="step">3</span>
+        <h2>What would a better work week look like?</h2>
+        <p>Combed isn't trying to fill every hour. It's trying to help you keep your income while giving you back time. The hours target is only used once you've added typical service times above.</p>
+      </div>
+      <form class="goals" id="goals-form" novalidate>
+        <label class="field">
+          <span>Workdays per week you'd like</span>
+          <input type="number" min="1" max="7" step="1" name="desired_workdays_per_week" inputmode="numeric">
+        </label>
+        <label class="field">
+          <span>Weekly gross income you'd like</span>
+          <div class="field__money"><b>$</b><input type="number" min="0" step="50" name="desired_weekly_gross" inputmode="numeric"></div>
+        </label>
+        <label class="field">
+          <span>Most hours behind the chair per week</span>
+          <input type="number" min="1" max="80" step="1" name="max_weekly_chair_hours" inputmode="numeric">
+        </label>
+        <label class="field field--opt">
+          <span>Monthly fixed salon costs <em>optional</em></span>
+          <div class="field__money"><b>$</b><input type="number" min="0" step="25" name="monthly_fixed_costs" inputmode="numeric"></div>
+        </label>
+        <label class="field field--opt">
+          <span>Monthly product & supply costs <em>optional</em></span>
+          <div class="field__money"><b>$</b><input type="number" min="0" step="25" name="monthly_supply_costs" inputmode="numeric"></div>
+        </label>
+        <p class="goals__target" id="goals-target"></p>
+      </form>
+    </section>
+
+    <!-- ═══════════════════════ 5. ANALYZE ═══════════════════════ -->
+    <section class="section section--analyze" id="analyze">
+      <div class="analyze-card">
+        <div>
+          <h2 class="display">Ready?</h2>
+          <p>Combed will read your numbers, look around North Highlands, and build your Chair Cone.</p>
+          <fieldset class="mode">
+            <legend class="sr-only">Analysis mode</legend>
+            <label><input type="radio" name="mode" value="live" checked> <span><strong>Live</strong> — real Apify + AI calls</span></label>
+            <label><input type="radio" name="mode" value="demo"> <span><strong>Demo</strong> — offline, no API calls</span></label>
+          </fieldset>
+        </div>
+        <button class="btn btn--primary btn--xl" type="button" id="analyze-btn">COMB MY BUSINESS</button>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ 6. LOADING ═══════════════════════ -->
+    <section class="section loading" id="loading" hidden aria-live="polite">
+      <div class="loading__comb" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="loading__msg" id="loading-msg">Reading your appointment book…</p>
+      <p class="loading__sub">Live calls can take a minute or two. Your information stays right here.</p>
+    </section>
+
+    <!-- ═══════════════════════ ERROR ═══════════════════════ -->
+    <section class="section error" id="error" hidden role="alert">
+      <h2>Combed couldn't finish your Chair Cone this time.</h2>
+      <p id="error-msg">Your information is still here — try the analysis again.</p>
+      <div class="row-actions">
+        <button class="btn btn--primary" type="button" id="retry-btn">Try again</button>
+        <button class="btn btn--ghost" type="button" id="demo-instead-btn">Show the demo report instead</button>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════ 7–16. REPORT ═══════════════════════ -->
+    <section class="report" id="report" hidden tabindex="-1"></section>
+  </main>
+
+  <!-- ═══════════════════════ 17. FOOTER ═══════════════════════ -->
+  <footer class="footer">
+    <div class="wordmark wordmark--sm" aria-hidden="true"><span>CO</span><svg class="pick-m" viewBox="0 0 100 100"><path d="M6 12h20l24 30 24-30h20v30H6z"/><rect x="6" y="38" width="11" height="56" rx="4"/><rect x="26" y="38" width="11" height="56" rx="4"/><rect x="44.5" y="38" width="11" height="56" rx="4"/><rect x="63" y="38" width="11" height="56" rx="4"/><rect x="83" y="38" width="11" height="56" rx="4"/></svg><span>BED</span></div>
+    <p class="footer__line">You're already doing the work. Combed helps you see what the work is telling you.</p>
+    <p class="footer__fine">Combed adds an intelligence layer to the business you already built. Gross revenue is not profit. Client names are never shown. Local signals are powered by Apify when live mode is on.</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/mock-market.js"></script>
+  <script src="js/ingest.js"></script>
+  <script src="js/calc.js"></script>
+  <script src="js/narrative.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

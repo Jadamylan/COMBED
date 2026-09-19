@@ -1,0 +1,18 @@
+{
+  "name": "combed",
+  "version": "0.1.0",
+  "description": "Combed — Know your chair. Work it smarter. AI business intelligence for independent hairstylists.",
+  "private": true,
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
