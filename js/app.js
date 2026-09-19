@@ -232,18 +232,33 @@
   });
 
   /* ── Upload + read the book ────────────────────────────────────────── */
+  const UP = CONFIG.UPLOAD;
   const fileInput = $('#file-input'); const thumbs = $('#thumbs'); const dz = $('#dropzone');
+  fileInput.accept = [...UP.ACCEPTED_TYPES, ...UP.ACCEPTED_EXTENSIONS.map((e) => `.${e}`)].join(',');
+  $('#upload-types').textContent = UP.LABEL;
   const files = [];
+
+  const ext = (f) => (f.name.split('.').pop() || '').toLowerCase();
+  const isHeic = (f) => /hei[cf]/i.test(f.type) || ['heic', 'heif'].includes(ext(f));
+  const isAccepted = (f) => UP.ACCEPTED_TYPES.includes(f.type) || UP.ACCEPTED_EXTENSIONS.includes(ext(f));
+
   function refreshReadActions() { $('#read-actions').hidden = files.length === 0; state.bookRead = false; }
   function addFiles(list) {
-    [...list].filter((f) => f.type.startsWith('image/') || /\.heic$/i.test(f.name)).slice(0, Math.max(0, 6 - files.length)).forEach((f) => {
+    const rejected = [];
+    [...list].forEach((f) => {
+      if (!isAccepted(f)) { rejected.push(f.name); return; }
+      if (files.length >= UP.MAX_FILES) return;
       files.push(f);
       const li = document.createElement('li');
-      const url = URL.createObjectURL(f);
-      li.innerHTML = `<img src="${url}" alt="Appointment book page ${files.length}"><span>Page ${files.length}</span><button type="button" aria-label="Remove page ${files.length}">×</button>`;
+      li.innerHTML = `<img alt="Appointment book page ${files.length}"><span>Page ${files.length}${isHeic(f) ? ' · HEIC' : ''}</span><button type="button" aria-label="Remove page ${files.length}">×</button>`;
+      // Thumbnails: browsers that can't decode HEIC show a labeled tile instead of a broken image.
+      const url = URL.createObjectURL(f); const img = li.querySelector('img');
+      img.onerror = () => { img.replaceWith(Object.assign(document.createElement('div'), { className: 'thumb-ph', textContent: isHeic(f) ? 'HEIC photo' : 'Photo' })); };
+      img.src = url;
       li.querySelector('button').addEventListener('click', () => { files.splice(files.indexOf(f), 1); URL.revokeObjectURL(url); li.remove(); refreshReadActions(); });
       thumbs.appendChild(li);
     });
+    if (rejected.length) { const s = $('#read-status'); s.classList.add('is-error'); s.textContent = `Skipped ${rejected.join(', ')} — not a supported photo type (${UP.LABEL}).`; }
     refreshReadActions();
   }
   fileInput.addEventListener('change', (e) => addFiles(e.target.files));
@@ -251,34 +266,55 @@
   ['dragleave', 'drop'].forEach((ev) => dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('is-over'); }));
   dz.addEventListener('drop', (e) => addFiles(e.dataTransfer.files));
 
-  /* Prepare one page photo for the reader.
+  /* Decode a file to a bitmap the canvas can draw. Native first (Safari handles HEIC, and EXIF
+     orientation is applied by createImageBitmap); if that fails on a HEIC/HEIF file, load the
+     converter on demand and turn it into a JPEG blob, then decode that. */
+  let heicConverter = null;
+  function loadHeicConverter() {
+    if (heicConverter) return heicConverter;
+    heicConverter = new Promise((resolve, reject) => {
+      if (window.heic2any) return resolve(window.heic2any);
+      const s = document.createElement('script');
+      s.src = UP.HEIC_CONVERTER_URL; s.onload = () => (window.heic2any ? resolve(window.heic2any) : reject(new Error('converter unavailable'))); s.onerror = () => reject(new Error('converter unavailable'));
+      document.head.appendChild(s);
+    });
+    return heicConverter;
+  }
+  async function decodeToBitmap(file) {
+    try { return await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch { /* fall through */ }
+    if (isHeic(file)) {
+      const heic2any = await loadHeicConverter().catch(() => null);
+      if (!heic2any) throw new Error(UP.HEIC_FAIL_MESSAGE);
+      const out = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 }).catch(() => null);
+      const blob = Array.isArray(out) ? out[0] : out;
+      if (!blob) throw new Error(UP.HEIC_FAIL_MESSAGE);
+      try { return await createImageBitmap(blob); } catch { throw new Error(UP.HEIC_FAIL_MESSAGE); }
+    }
+    throw new Error(`${file.name} couldn't be opened in this browser. Try saving it as a JPG.`);
+  }
+
+  /* Normalize one page photo for the reader → { parts: [{media_type, data}, …] }.
      A landscape photo of a two-page spread is sent three ways: the FULL spread (so the printed month,
      year, and day numbers are always in view) plus LEFT and RIGHT close-ups (with a little overlap) so
      the cursive arrives at full legibility — the reading model downsizes anything over ~1568px.
-     Each part is capped at 1568px on its long edge as JPEG. Also converts HEIC where the browser can
-     decode it (Safari); otherwise we ask for JPG. Returns { parts: [{media_type, data}, …] }. */
-  function fileToPageParts(file, maxPx = 1568) {
-    return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(file);
-      const img = new Image();
-      img.onload = () => {
-        const W = img.naturalWidth, H = img.naturalHeight;
-        const crops = W > H * 1.15
-          ? [{ sx: 0, sw: W }, { sx: 0, sw: Math.round(W * 0.54) }, { sx: Math.round(W * 0.46), sw: W - Math.round(W * 0.46) }]   // full, left, right
-          : [{ sx: 0, sw: W }];                                                                                                     // single page
-        const parts = crops.map(({ sx, sw }) => {
-          const scale = Math.min(1, maxPx / Math.max(sw, H));
-          const c = document.createElement('canvas');
-          c.width = Math.round(sw * scale); c.height = Math.round(H * scale);
-          c.getContext('2d').drawImage(img, sx, 0, sw, H, 0, 0, c.width, c.height);
-          return { media_type: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.9).split(',')[1] };
-        });
-        URL.revokeObjectURL(url);
-        resolve({ parts });
-      };
-      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error(`${file.name} couldn't be opened in this browser. HEIC photos need to be saved as JPG first.`)); };
-      img.src = url;
+     Every part is re-encoded as UPLOAD.NORMALIZED_TYPE, so HEIC/PNG/WEBP all leave the browser as JPEG. */
+  async function fileToPageParts(file) {
+    const bmp = await decodeToBitmap(file);
+    const W = bmp.width, H = bmp.height;
+    const crops = W > H * 1.15
+      ? [{ sx: 0, sw: W }, { sx: 0, sw: Math.round(W * 0.54) }, { sx: Math.round(W * 0.46), sw: W - Math.round(W * 0.46) }]   // full, left, right
+      : [{ sx: 0, sw: W }];                                                                                                     // single page
+    const parts = crops.map(({ sx, sw }) => {
+      const scale = Math.min(1, UP.MAX_EDGE_PX / Math.max(sw, H));
+      const c = document.createElement('canvas');
+      c.width = Math.round(sw * scale); c.height = Math.round(H * scale);
+      c.getContext('2d').drawImage(bmp, sx, 0, sw, H, 0, 0, c.width, c.height);
+      return { media_type: UP.NORMALIZED_TYPE, data: c.toDataURL(UP.NORMALIZED_TYPE, UP.JPEG_QUALITY).split(',')[1] };
     });
+    bmp.close?.();
+    const kb = Math.round(parts.reduce((s, p) => s + (p.data.length * 3) / 4, 0) / 1024);
+    console.log(`Upload normalized: "${file.name}" | original ${file.type || `(none, .${ext(file)})`} → ${UP.NORMALIZED_TYPE} | ${parts.length} part(s), ${kb} KB`);
+    return { parts };
   }
 
   async function readBook({ quiet = false } = {}) {
@@ -286,19 +322,25 @@
     btn.disabled = true; status.classList.remove('is-error'); notes.hidden = true; notes.innerHTML = '';
     try {
       status.textContent = 'Preparing your photos…';
-      const pages = [];
-      for (const f of files) pages.push(await fileToPageParts(f));
-      status.textContent = `Reading ${pages.length} page${pages.length === 1 ? '' : 's'} of cursive… this can take a minute.`;
+      const pages = []; const pageFiles = []; const problems = [];
+      for (const f of files) {
+        try { pages.push(await fileToPageParts(f)); pageFiles.push(f); }
+        catch (err) { console.warn(`Upload skipped: "${f.name}" — ${err.message}`); problems.push({ name: f.name, message: err.message }); }
+      }
+      if (!pages.length) throw new Error(problems.map((p) => p.message).join(' ') || 'None of the photos could be prepared.');
+      status.textContent = `Reading ${pages.length} page${pages.length === 1 ? '' : 's'} of cursive${problems.length ? ` (${problems.length} photo${problems.length === 1 ? '' : 's'} skipped)` : ''}… this can take a minute.`;
       const res = await postJSON('/api/extract-book', { pages, year: CONFIG.DEMO_YEAR }, 300000);
+      res.pages.forEach((p) => { p.file_name = pageFiles[p.image_index]?.name || `Photo ${p.image_index + 1}`; });
 
       loadExtraction(res);
       const { verifiedAppointments, reviewLaterAppointments } = ingest.splitByConfidence(state.appointments);
       console.log('Extracted appointments:', state.appointments.length, '| verified:', verifiedAppointments.length, '| review later:', reviewLaterAppointments.length);
       status.textContent = `Found ${res.entries.length} appointments across ${res.pages.length} page${res.pages.length === 1 ? '' : 's'} — ${verifiedAppointments.length} ready for analysis${reviewLaterAppointments.length ? `, ${reviewLaterAppointments.length} set aside for later` : ''}.`;
 
-      notes.innerHTML = res.pages.map((p) => `<li class="${p.readable ? '' : 'is-warn'}"><strong>Page ${p.image_index + 1}:</strong> ${p.readable
+      notes.innerHTML = res.pages.map((p) => `<li class="${p.readable ? '' : 'is-warn'}"><strong>${esc(p.file_name)}:</strong> ${p.readable
         ? `${p.entries_found} appointment${p.entries_found === 1 ? '' : 's'}${p.dates_visible.length ? ` · ${p.dates_visible.length} calendar day${p.dates_visible.length === 1 ? '' : 's'} visible` : ''}`
         : `couldn't be read clearly — try a straighter, brighter photo of this page.${p.notes ? ` (${esc(p.notes)})` : ''}`}</li>`).join('')
+        + problems.map((p) => `<li class="is-warn"><strong>${esc(p.name)}:</strong> skipped — ${esc(p.message)}</li>`).join('')
         + (res.undated_entries ? `<li class="is-warn">${res.undated_entries} entr${res.undated_entries === 1 ? 'y' : 'ies'} had no readable date and ${res.undated_entries === 1 ? 'was' : 'were'} left out.</li>` : '')
         + (res.skipped?.length ? `<li>${res.skipped.length} line${res.skipped.length === 1 ? '' : 's'} set aside as notes or cancellations — listed under the review table.</li>` : '');
       notes.hidden = false;

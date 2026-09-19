@@ -108,10 +108,12 @@ Switch the toggle above **Comb my business** to *Demo* to run the full report of
 
 ### Using real appointment-book photos
 
-1. Drop up to six page photos into the upload box.
-2. Press **Read my book**. Each spread is read separately; a landscape photo is also sent as left/right close-ups so the cursive stays legible.
+1. Drop up to six page photos into the upload box. Accepted: JPG, PNG, WEBP, HEIC/HEIF (iPhone). Every photo is normalized to JPEG in the browser before it is sent anywhere; HEIC is decoded natively where the browser supports it (Safari) and converted on demand elsewhere. A photo that can't be converted is skipped with a clear message and does not block the others.
+2. Press **Read my book**. Each spread is read separately; a landscape photo is sent as the full spread plus left/right close-ups so the printed dates stay in view and the cursive stays legible.
 3. Entries read at 85%+ confidence are included automatically. Everything else appears under **Review for Later Analysis** and in the optional review table, where a correction promotes the row into the analysis.
 4. Press **Comb my business**.
+
+Upload rules (accepted types, size cap, normalized type) live in one place: `CONFIG.UPLOAD` in `js/config.js`.
 
 ---
 

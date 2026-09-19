@@ -79,10 +79,10 @@
       </div>
 
       <label class="dropzone" for="file-input" id="dropzone">
-        <input type="file" id="file-input" accept="image/*" multiple hidden>
+        <input type="file" id="file-input" multiple hidden>
         <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 34v4a4 4 0 004 4h20a4 4 0 004-4v-4M24 6v26M14 16l10-10 10 10" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <strong>Tap to add photos</strong>
-        <span>or drag them here · JPG, PNG, HEIC</span>
+        <span>or drag them here · <span id="upload-types"></span></span>
       </label>
       <ul class="thumbs" id="thumbs" aria-live="polite"></ul>
       <div class="row-actions" id="read-actions" hidden>

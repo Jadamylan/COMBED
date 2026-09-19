@@ -156,6 +156,7 @@ button, input, select { font: inherit; color: inherit; }
 .thumbs li { position: relative; width: 140px; }
 .thumbs img { width: 140px; height: 180px; object-fit: cover; border-radius: 14px; border: var(--border) solid var(--ink); }
 .thumbs span { display: block; margin-top: 6px; font-weight: 600; font-size: 15px; }
+.thumb-ph { display: grid; place-items: center; width: 140px; height: 180px; border-radius: 14px; border: var(--border) solid var(--ink); background: var(--emerald); color: var(--cream); font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-align: center; padding: 8px; }
 .thumbs button { position: absolute; top: -10px; right: -10px; width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--ink); background: var(--cream); font-size: 20px; cursor: pointer; }
 .read-status { font-weight: 600; color: var(--emerald); }
 .read-status.is-error { color: #8f0d4d; }

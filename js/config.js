@@ -54,6 +54,22 @@ Combed.CONFIG = {
   // Label → numeric normalization when the reader returns labels instead of numbers.
   CONFIDENCE_SCORES: { high: 0.95, medium: 0.75, low: 0.5 },
 
+  // Upload rules — the single source for the file picker, the helper text, and client-side checks.
+  // Every accepted file is normalized to image/jpeg in the browser before it is sent to the server,
+  // so the server only ever sees NORMALIZED_TYPE (see lib/extract.js ALLOWED_MEDIA).
+  UPLOAD: {
+    ACCEPTED_TYPES: ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'],
+    ACCEPTED_EXTENSIONS: ['jpg', 'jpeg', 'png', 'webp', 'heic', 'heif'],
+    LABEL: 'JPG, PNG, WEBP, HEIC',
+    NORMALIZED_TYPE: 'image/jpeg',
+    MAX_FILES: 6,
+    MAX_EDGE_PX: 1568,
+    JPEG_QUALITY: 0.9,
+    // Loaded on demand only when a browser can't decode HEIC natively (Chrome, Firefox).
+    HEIC_CONVERTER_URL: 'https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js',
+    HEIC_FAIL_MESSAGE: 'This photo is in iPhone HEIC format. Please export or share it as a JPG and upload it again.',
+  },
+
   // Book-time interpretation: a bare number like "3" is a START TIME, never a duration.
   // Hours 7–11 read as morning; 12 and 1–6 read as afternoon/evening.
   BOOK_TIME_AM_HOURS: [7, 8, 9, 10, 11],
