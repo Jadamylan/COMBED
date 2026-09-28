@@ -2,131 +2,208 @@
 
 **Know your chair. Work it smarter.**
 
-Combed turns the handwritten appointment book a stylist already uses into clear answers about her schedule, her prices, her services, and her time. It reads photos of the book, combines what it finds with the business knowledge only the stylist has, adds local market context, and produces a plain-language plan for the next 20 days.
+<p align="center">
+  <img src="assets/salon-1.jpg" width="31%" alt="Salon workspace">
+  <img src="assets/salon-2.jpg" width="31%" alt="Salon workspace">
+  <img src="assets/salon-3.jpg" width="31%" alt="Salon workspace">
+</p>
 
-Built for longtime independent hairstylists who know hair, not spreadsheets. First test user: an old-school salon in North Highlands, California.
+COMBED turns the handwritten appointment book a stylist already uses into clear answers about her schedule, pricing, services, revenue patterns, and time.
+
+It reads photos of the book, combines what it finds with the business knowledge only the stylist has, adds local-market context, and produces a plain-language plan for the next 20 days.
+
+**Built for longtime independent hairstylists who know hair, not spreadsheets.**  
+First test user: an old-school salon in North Highlands, California.
+
+> Built at Claude Build Day and recognized with a special COMBED project award.
 
 ---
 
-## What it does
+## The problem
 
-```
+My mom has been doing hair for years. She knows her clients, her services, and her chair — but the business data was living in a handwritten appointment book.
+
+That means questions like these are harder than they should be:
+
+- Which days actually bring in the most?
+- Which services are doing the heavy lifting?
+- Are prices consistent?
+- Where are the gaps in the next few weeks?
+- What should change first if the goal is to earn smarter, not simply work more?
+
+COMBED is my attempt to turn the system she already uses into something that can answer those questions.
+
+---
+
+## What COMBED does
+
+```text
 Appointment-book photos (cursive)
-        ↓  vision reading, one page at a time
-Structured appointments  →  confidence ≥ 85% go straight into the analysis
-        ↓                    (the rest are listed under "Review for Later Analysis")
-Business calculations (revenue, average ticket, price consistency, service mix, day patterns)
-        +  Live local-market signals from Apify (North Highlands salons)
-        +  Live AI reasoning
         ↓
-YOUR CHAIR, COMBED (the Chair Cone report)  →  Your Next 20 Days
+Vision reading, one page at a time
+        ↓
+Structured appointments
+  ├── confidence ≥ 85% → analysis
+  └── lower confidence → Review for Later Analysis
+        ↓
+Business calculations
+  + local-market signals from Apify
+  + AI reasoning
+        ↓
+YOUR CHAIR, COMBED
+        ↓
+A plain-language plan for the next 20 days
 ```
 
-The report is one scrolling page:
+The report covers:
 
-1. **Your Chair Cone** — appointments, observed gross revenue, average ticket, top booked service, analysis coverage
-2. **Here's what your chair is telling you** — a short synopsis grounded in the numbers
-3. **What each day brought in** — revenue by working day
-4. **Which services brought the most into your chair** — services ranked by observed revenue
-5. **Are your prices working as hard as you are?** — price consistency per service, Family Discount visits set aside
-6. **What's worth your energy?** — money vs. physical effort (unlocks once the stylist adds typical service times)
-7. **Where your chair is working hardest** — when appointments start, by weekday
-8. **What's happening around your chair** — local signals, powered by Apify
+1. **Your Chair Cone** — appointments, observed gross revenue, average ticket, top booked service, and analysis coverage
+2. **What your chair is telling you** — a short synopsis grounded in the numbers
+3. **What each day brought in** — observed revenue by working day
+4. **Which services brought the most into your chair** — ranked by observed revenue
+5. **Are your prices working as hard as you are?** — price consistency by service
+6. **What’s worth your energy?** — money vs. physical effort once the stylist adds typical service times
+7. **Where your chair is working hardest** — appointment-start patterns by weekday
+8. **What’s happening around your chair** — local market signals
 9. **Your Next 20 Days** — up to four moves and one measurable goal
-10. **Review for Later Analysis** — appointments that were not read confidently enough to include
+10. **Review for Later Analysis** — entries that were not read confidently enough to include
 
-### Honest by design
+---
 
-- Numbers written in the schedule are **start times**, never durations. The book does not record how long a service took, so Combed never shows hours, revenue per hour, or time-based price signals until the stylist supplies typical service times herself.
-- Client names are replaced with `Client 01, 02, …` the moment a page is read. Names never reach the report or the server.
-- Discounted visits are separated, not judged. Gross revenue is never called profit.
-- Every recommendation has a "Why Combed is saying this" disclosure with the supporting numbers.
-- If the local-market lookup fails, the report still renders. If the AI step fails, the report renders from the calculated numbers with a rule-based narrative.
+## Honest by design
+
+A big part of this build was deciding what **not** to infer.
+
+- A time written in the book is an appointment **start time**, not a service duration.
+- COMBED does not show revenue per hour until the stylist supplies typical service times.
+- Client names are replaced with `Client 01, 02, …` before they reach the report or server.
+- Discounted visits are separated, not judged.
+- Gross revenue is never called profit.
+- Recommendations include the supporting numbers behind them.
+- If the market lookup fails, the report still renders.
+- If the AI step fails, the report falls back to calculated metrics and a rule-based narrative.
+
+---
+
+## Stack
+
+- **Frontend:** HTML, CSS, JavaScript
+- **Server:** Node + Express
+- **Vision + reasoning:** Claude-compatible Messages API
+- **Local market context:** Apify
+- **Demo mode:** anonymized sample appointments + fictional local places
+- **Safety:** server-side secrets, upload normalization, confidence threshold, immediate client anonymization
 
 ---
 
 ## Project layout
 
-```
-index.html            the whole customer-facing app, one page
-css/styles.css        brand system (cream / emerald / lime / magenta; Archivo Black + Work Sans)
-js/config.js          demo year, observed dates, status vocabulary, confidence threshold
-js/ingest.js          book-time interpretation, service grouping, anonymization, confidence scoring
-js/calc.js            business calculations (formulas documented at the top of the file)
-js/narrative.js       rule-based narrative used in demo mode and as the AI fallback
-js/render.js          renders the report schema; the single render path for demo and live
-js/app.js             upload → read → optional review → goals → analyze → report
-js/mock-data.js       anonymized sample appointments in the exact extraction schema
+```text
+index.html            customer-facing app
+css/styles.css        COMBED brand system
+js/config.js          dates, vocabulary, confidence threshold, upload rules
+js/ingest.js          time interpretation, service grouping, anonymization
+js/calc.js            business calculations
+js/narrative.js       rule-based fallback narrative
+js/render.js          single report render path
+js/app.js             upload → read → review → goals → analyze → report
+js/mock-data.js       anonymized sample appointments
 js/mock-market.js     fictional local places for offline demo mode
-server.js             Express server; serves the page and keeps every secret server-side
-lib/extract.js        appointment-book reading (vision) with the cursive interpretation rules
-lib/apify.js          Apify Actor call, result normalization, counted market summary
-lib/report.js         AI report call, strict JSON handling, numbers-win merge
-assets/               hero collage photos (salon-1/2/3.jpg)
+server.js             Express server + API routes
+lib/extract.js        appointment-book vision extraction
+lib/apify.js          local-market lookup + normalization
+lib/report.js         AI report generation + strict JSON handling
 ```
-
-### API routes
-
-| Route | Purpose |
-|---|---|
-| `POST /api/extract-book` | Read page photos → structured appointments (with per-page readability and skipped notes) |
-| `POST /api/local-market` | Run the configured Apify Actor for North Highlands salons → normalized places + counted summary |
-| `POST /api/generate-report` | Send calculated metrics + market data to the reasoning model → Combed report JSON |
-| `GET /api/health` | Confirms which keys are configured without revealing them |
 
 ---
 
-## Running it
+## Run it locally
 
-Requires Node 20.12+ (uses the built-in `.env` loader; no dotenv dependency).
+Requires **Node 20.12+**.
 
 ```bash
 npm install
-cp .env.example .env     # add your keys
-npm start                # http://localhost:3000
+cp .env.example .env
+npm start
 ```
 
-If port 3000 is busy: `PORT=3210 npm start`.
+Default: `http://localhost:3000`
+
+If port 3000 is busy:
+
+```bash
+PORT=3210 npm start
+```
 
 ### Environment variables
 
-| Variable | Notes |
+| Variable | Purpose |
 |---|---|
-| `MODEL_API_KEY` | Messages API key for reading pages and generating the report |
-| `MODEL_NAME` | Defaults to `claude-sonnet-4-5` |
-| `MODEL_API_URL` | Defaults to `https://api.anthropic.com/v1/messages` |
-| `APIFY_API_TOKEN` | Apify token, used server-side only |
-| `APIFY_ACTOR_ID` | `username~actor-name`; defaults to `compass~crawler-google-places`. Input builder lives in `lib/apify.js` |
-| `APIFY_MAX_RESULTS` | Keep small (default 10) for a fast live run |
-| `PORT` | Defaults to 3000 |
+| `MODEL_API_KEY` | Vision + report-generation API key |
+| `MODEL_NAME` | Model name |
+| `MODEL_API_URL` | Messages API endpoint |
+| `APIFY_API_TOKEN` | Server-side Apify token |
+| `APIFY_ACTOR_ID` | Actor used for local-market lookup |
+| `APIFY_MAX_RESULTS` | Result cap for faster live runs |
+| `PORT` | Local server port |
 
 `.env` is git-ignored. Never commit keys.
 
-### Demo mode
+---
 
-Switch the toggle above **Comb my business** to *Demo* to run the full report offline with the labeled sample data and fictional local places. Demo and live mode share the same rendering code.
+## Demo mode
 
-### Using real appointment-book photos
+Switch the toggle above **Comb my business** to *Demo* to run the report offline with labeled sample data and fictional local places.
 
-1. Drop up to six page photos into the upload box. Accepted: JPG, PNG, WEBP, HEIC/HEIF (iPhone). Every photo is normalized to JPEG in the browser before it is sent anywhere; HEIC is decoded natively where the browser supports it (Safari) and converted on demand elsewhere. A photo that can't be converted is skipped with a clear message and does not block the others.
-2. Press **Read my book**. Each spread is read separately; a landscape photo is sent as the full spread plus left/right close-ups so the printed dates stay in view and the cursive stays legible.
-3. Entries read at 85%+ confidence are included automatically. Everything else appears under **Review for Later Analysis** and in the optional review table, where a correction promotes the row into the analysis.
-4. Press **Comb my business**.
-
-Upload rules (accepted types, size cap, normalized type) live in one place: `CONFIG.UPLOAD` in `js/config.js`.
+Demo and live mode use the same render path.
 
 ---
 
-## How Combed calculates
+## Using real appointment-book photos
 
-Observed gross revenue is the dollar amounts written next to appointments, added up. Average ticket is revenue divided by appointments with a readable amount. A service's observed range is the lowest and highest amount charged for it; visits marked Family Discount are set aside before a price is called "standard". A day's spread is the time from the first appointment start to the last appointment start.
+1. Drop up to six page photos into the upload box.
+2. Press **Read my book**.
+3. Entries read at **85%+ confidence** are included automatically.
+4. Lower-confidence rows are routed to review instead of being silently guessed.
+5. Press **Comb my business**.
 
-Only when the stylist supplies typical service times: estimated hours, revenue per estimated hour, target hourly rate (desired weekly gross ÷ preferred weekly chair hours), and a sustainable price signal (target rate × typical hours + supply cost, rounded to $5). Those are shown as estimates and never inferred from the gaps between appointments.
+Accepted upload behavior lives in `CONFIG.UPLOAD` inside `js/config.js`.
+
+---
+
+## How the calculations work
+
+Observed gross revenue is the sum of readable dollar amounts written next to appointments.
+
+Average ticket is:
+
+```text
+observed gross revenue ÷ appointments with a readable amount
+```
+
+For each service, COMBED tracks the observed price range. Visits marked **Family Discount** are separated before a price is treated as standard.
+
+A day’s spread is the time between the first and last appointment **start**, not estimated labor hours.
+
+Only after a stylist supplies typical service durations can COMBED estimate:
+
+- service hours
+- revenue per estimated hour
+- target hourly rate
+- a sustainable price signal
+
+Those values are labeled as estimates.
 
 ---
 
 ## Roadmap
 
-- Compare consecutive 20-day periods (observe → recommend → change → measure → improve). Report snapshots are already stored locally for this.
-- Stylist-supplied service duration profiles as a first-class step.
-- Broader service vocabulary learned from the stylist's own book.
+- compare consecutive 20-day periods: **observe → recommend → change → measure**
+- make stylist-supplied service-duration profiles a first-class setup step
+- learn a broader service vocabulary from each stylist’s own book
+- strengthen review workflows for ambiguous handwritten entries
+- package the workflow for additional independent stylists
+
+---
+
+COMBED started with one chair and one handwritten book. The bigger idea is simple: **small businesses already have data — sometimes it just does not look like data yet.**
